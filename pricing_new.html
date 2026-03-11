@@ -128,7 +128,231 @@
 <a class="text-center text-white text-base leading-normal self-stretch px-6 py-2 bg-y50 rounded inline-flex justify-center items-center gap-3 overflow-hidden" href="https://oa.zalo.me/manage/subscription?utm_source=oapricing">Mua ngay</a>
 </div>
 </div>
-</div><div class="text-center mt-4">*Áp dụng mã ưu đãi tại bước thanh toán để được hưởng chiết khấu</div></div></div></div><div class="pt-10 bg-n20 md:pt-15 max-w-full">
+</div><div class="text-center mt-4">*Áp dụng mã ưu đãi tại bước thanh toán để được hưởng chiết khấu</div></div></div></div>
+<!-- ═══════════════════════════════════════════════
+     GỢI Ý GÓI PHÙ HỢP
+═══════════════════════════════════════════════ -->
+<div class="w-full flex justify-center py-8 bg-white">
+  <button
+    onclick="document.getElementById('suggest-modal').classList.remove('hidden')"
+    class="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-white text-lg font-semibold shadow-lg transition-all hover:scale-105 active:scale-95"
+    style="background: linear-gradient(135deg, #0068FF 0%, #00AAFF 100%);">
+    <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11 2a9 9 0 1 0 0 18A9 9 0 0 0 11 2zm.917 13.75h-1.834V10.083h1.834V15.75zm0-7.333h-1.834V6.583h1.834v1.834z" fill="#fff"/>
+    </svg>
+    Gợi ý gói phù hợp
+  </button>
+</div>
+
+<!-- ── MODAL OVERLAY ── -->
+<div id="suggest-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.55);">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg" style="max-height:90vh;overflow-y:auto;">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-4" style="border-bottom:1px solid #F3F4F6;">
+      <div>
+        <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0;">Gợi ý gói phù hợp</h2>
+        <p style="font-size:13px;color:#9CA3AF;margin:2px 0 0;">Trả lời 5 câu hỏi để nhận gợi ý tốt nhất</p>
+      </div>
+      <button onclick="closeSuggest()" style="width:32px;height:32px;border-radius:50%;border:none;background:#F9FAFB;cursor:pointer;font-size:18px;color:#6B7280;display:flex;align-items:center;justify-content:center;">&times;</button>
+    </div>
+
+    <!-- Progress dots -->
+    <div class="px-6 pt-4">
+      <div style="display:flex;gap:6px;">
+        <div id="dot1" style="height:5px;border-radius:3px;flex:1;background:#0068FF;transition:background .2s;"></div>
+        <div id="dot2" style="height:5px;border-radius:3px;flex:1;background:#E5E7EB;transition:background .2s;"></div>
+        <div id="dot3" style="height:5px;border-radius:3px;flex:1;background:#E5E7EB;transition:background .2s;"></div>
+        <div id="dot4" style="height:5px;border-radius:3px;flex:1;background:#E5E7EB;transition:background .2s;"></div>
+        <div id="dot5" style="height:5px;border-radius:3px;flex:1;background:#E5E7EB;transition:background .2s;"></div>
+      </div>
+      <p id="step-label" style="font-size:12px;color:#9CA3AF;text-align:right;margin:4px 0 0;">Câu 1 / 5</p>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 pb-2">
+
+      <!-- Q1 -->
+      <div id="step1" class="suggest-step">
+        <p style="font-weight:600;color:#1F2937;margin:16px 0 14px;">Số lượng nhân sự quản lý OA của bạn là bao nhiêu?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label class="s-opt"><input type="radio" name="q1" value="3"><span>1 – 3 người</span></label>
+          <label class="s-opt"><input type="radio" name="q1" value="6"><span>4 – 6 người</span></label>
+          <label class="s-opt"><input type="radio" name="q1" value="15"><span>7 – 15 người</span></label>
+          <label class="s-opt"><input type="radio" name="q1" value="100"><span>Trên 15 người</span></label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div id="step2" class="suggest-step" style="display:none;">
+        <p style="font-weight:600;color:#1F2937;margin:16px 0 14px;">Bạn cần bao nhiêu tổng đài viên hỗ trợ khách hàng?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label class="s-opt"><input type="radio" name="q2" value="0"><span>Chưa cần</span></label>
+          <label class="s-opt"><input type="radio" name="q2" value="5"><span>2 – 5 tổng đài viên</span></label>
+          <label class="s-opt"><input type="radio" name="q2" value="10"><span>6 – 10 tổng đài viên</span></label>
+          <label class="s-opt"><input type="radio" name="q2" value="99"><span>Trên 10 tổng đài viên</span></label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div id="step3" class="suggest-step" style="display:none;">
+        <p style="font-weight:600;color:#1F2937;margin:16px 0 14px;">Bạn có nhu cầu tự động hóa hoặc tích hợp API không?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label class="s-opt"><input type="radio" name="q3" value="0"><span>Không, chỉ cần chat thủ công</span></label>
+          <label class="s-opt"><input type="radio" name="q3" value="1"><span>Có, muốn dùng Chatbot tự động</span></label>
+          <label class="s-opt"><input type="radio" name="q3" value="2"><span>Có, cần tích hợp API / phần mềm bên thứ 3</span></label>
+          <label class="s-opt"><input type="radio" name="q3" value="3"><span>Cả hai (Chatbot + API)</span></label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div id="step4" class="suggest-step" style="display:none;">
+        <p style="font-weight:600;color:#1F2937;margin:16px 0 14px;">Nhu cầu gửi tin Tư vấn ngoài khung 48h mỗi tháng?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label class="s-opt"><input type="radio" name="q4" value="0"><span>Không cần</span></label>
+          <label class="s-opt"><input type="radio" name="q4" value="500"><span>Ít — dưới 1.000 tin/tháng</span></label>
+          <label class="s-opt"><input type="radio" name="q4" value="5000"><span>Vừa — 1.000 đến 9.000 tin/tháng</span></label>
+          <label class="s-opt"><input type="radio" name="q4" value="9999"><span>Nhiều — trên 9.000 tin/tháng</span></label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div id="step5" class="suggest-step" style="display:none;">
+        <p style="font-weight:600;color:#1F2937;margin:16px 0 6px;">Bạn có cần tính năng thương hiệu nâng cao không?</p>
+        <p style="font-size:13px;color:#6B7280;margin:0 0 14px;">URL tùy biến, hình nền cửa sổ chat, ưu tiên tính năng mới ra mắt</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label class="s-opt"><input type="radio" name="q5" value="0"><span>Chưa cần</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="1"><span>Có, muốn nổi bật thương hiệu trên Zalo</span></label>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div id="step-result" style="display:none;padding:12px 0 4px;">
+        <div id="result-card" style="border-radius:14px;padding:24px;text-align:center;margin-bottom:12px;"></div>
+        <div id="result-reasons" style="border-radius:12px;border:1px solid #E5E7EB;padding:16px;font-size:14px;color:#374151;"></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 24px;border-top:1px solid #F3F4F6;">
+      <button id="btn-back" onclick="stepBack()" style="display:none;padding:10px 20px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;color:#374151;font-size:14px;font-weight:500;cursor:pointer;">← Quay lại</button>
+      <div style="flex:1;"></div>
+      <button id="btn-next" onclick="stepNext()" style="padding:10px 24px;border-radius:8px;border:none;background:#0068FF;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">Tiếp theo →</button>
+      <button id="btn-restart" onclick="restartSuggest()" style="display:none;padding:10px 20px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;color:#374151;font-size:14px;font-weight:500;cursor:pointer;">Làm lại</button>
+      <a id="btn-buy" href="https://oa.zalo.me/manage/subscription?utm_source=oapricing" style="display:none;padding:10px 24px;border-radius:8px;background:#0068FF;color:#fff;font-size:15px;font-weight:600;text-decoration:none;">Mua ngay →</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.suggest-step { animation: sFadeIn .2s ease; }
+@keyframes sFadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+.s-opt {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-radius:10px; cursor:pointer;
+  border:2px solid #E5E7EB; background:#fff;
+  font-size:14px; color:#374151; transition:border-color .15s, background .15s;
+}
+.s-opt:hover { border-color:#0068FF; background:#EFF6FF; }
+.s-opt input[type=radio] { accent-color:#0068FF; width:16px; height:16px; flex-shrink:0; }
+</style>
+
+<script>
+(function(){
+  var cur = 1, total = 5;
+  function $id(id){ return document.getElementById(id); }
+  function show(id){ $id(id).style.display=''; }
+  function hide(id){ $id(id).style.display='none'; }
+  function getVal(name){ var el=document.querySelector('input[name="'+name+'"]:checked'); return el?parseInt(el.value):null; }
+  function setOptCheckedStyle(){
+    document.querySelectorAll('.s-opt').forEach(function(lbl){
+      var inp = lbl.querySelector('input[type=radio]');
+      if(inp && inp.checked){ lbl.style.borderColor='#0068FF'; lbl.style.background='#EFF6FF'; lbl.style.fontWeight='600'; lbl.style.color='#1D4ED8'; }
+      else { lbl.style.borderColor='#E5E7EB'; lbl.style.background='#fff'; lbl.style.fontWeight='400'; lbl.style.color='#374151'; }
+    });
+  }
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.matches('.s-opt input[type=radio]')) setTimeout(setOptCheckedStyle,10);
+  });
+  function updateDots(step){
+    for(var i=1;i<=total;i++){
+      var d=$id('dot'+i); if(d) d.style.background = i<=step?'#0068FF':'#E5E7EB';
+    }
+    $id('step-label').textContent = step<=total ? ('Câu '+step+' / '+total) : 'Kết quả';
+  }
+  window.stepNext = function(){
+    if(cur<=total){
+      if(getVal('q'+cur) === null){ alert('Vui lòng chọn một đáp án!'); return; }
+      hide('step'+cur);
+    }
+    cur++;
+    if(cur<=total){
+      show('step'+cur); updateDots(cur); $id('btn-back').style.display='';
+    } else {
+      $id('btn-next').style.display='none';
+      show('step-result');
+      $id('btn-restart').style.display='';
+      $id('btn-buy').style.display='';
+      $id('btn-back').style.display='none';
+      updateDots(99);
+      buildResult();
+    }
+  };
+  window.stepBack = function(){
+    if(cur>total){ hide('step-result'); $id('btn-restart').style.display='none'; $id('btn-buy').style.display='none'; $id('btn-next').style.display=''; }
+    else { hide('step'+cur); }
+    cur--; show('step'+cur); updateDots(cur);
+    if(cur<=1) $id('btn-back').style.display='none';
+  };
+  window.restartSuggest = function(){
+    cur=1;
+    for(var i=1;i<=total;i++){ var c=document.querySelector('input[name="q'+i+'"]:checked'); if(c) c.checked=false; }
+    hide('step-result'); setOptCheckedStyle();
+    $id('btn-restart').style.display='none'; $id('btn-buy').style.display='none';
+    $id('btn-back').style.display='none'; $id('btn-next').style.display='';
+    show('step1'); updateDots(1);
+  };
+  window.closeSuggest = function(){
+    $id('suggest-modal').classList.add('hidden'); restartSuggest();
+  };
+  function buildResult(){
+    var admins=getVal('q1'), agents=getVal('q2'), auto=getVal('q3'), msgs=getVal('q4'), brand=getVal('q5');
+    var pkg, col, bg, reasons=[];
+    if(brand===1 || agents>5 || admins>15 || msgs>1000){
+      pkg='Max'; col='#92400E'; bg='#FFFBEB';
+      if(brand===1) reasons.push('Bạn cần tính năng thương hiệu nâng cao (URL tùy biến, hình nền, ưu tiên tính năng mới)');
+      if(agents>5)  reasons.push('Số tổng đài viên trên 5 người — gói Max hỗ trợ tối đa 10');
+      if(admins>15) reasons.push('Số lượng admin vượt giới hạn gói thấp hơn — Max hỗ trợ 100 admin');
+      if(msgs>1000) reasons.push('Nhu cầu tin Tư vấn ngoài khung vượt 1.000/tháng — Max có 9.000 tin sẵn');
+    } else if(auto>=1 || msgs>0){
+      pkg='Tự động hóa'; col='#1D4ED8'; bg='#EFF6FF';
+      if(auto>=1) reasons.push('Bạn cần Chatbot tự động hoặc tích hợp API bên thứ 3');
+      if(msgs>0)  reasons.push('Bạn có nhu cầu gửi tin Tư vấn ngoài khung — gói Tự động hóa có 1.000 tin/tháng');
+    } else {
+      pkg='Tương tác'; col='#1F2937'; bg='#F9FAFB';
+      if(admins>=4||agents>=2) reasons.push('Số lượng nhân sự và tổng đài viên phù hợp với gói Tương tác');
+      else reasons.push('Nhu cầu cơ bản, gói Tương tác đủ đáp ứng tốt với chi phí tối ưu');
+    }
+    var prices={'Tương tác':'83.000đ','Tự động hóa':'208.000đ','Max':'499.000đ'};
+    var yearly={'Tương tác':'999.000đ/năm','Tự động hóa':'2.499.000đ/năm','Max':'5.999.000đ/năm'};
+    var icons={'Tương tác':'💬','Tự động hóa':'⚙️','Max':'⭐'};
+    $id('result-card').innerHTML=
+      '<div style="background:'+bg+';border-radius:12px;padding:20px;">' +
+      '<div style="font-size:34px;margin-bottom:6px;">'+icons[pkg]+'</div>' +
+      '<p style="font-size:13px;color:#6B7280;margin:0 0 6px;">Gói phù hợp nhất với bạn</p>' +
+      '<p style="font-size:26px;font-weight:800;color:'+col+';margin:0 0 4px;">'+pkg+'</p>' +
+      '<p style="font-size:22px;font-weight:700;color:'+col+';margin:0;">'+prices[pkg]+' <span style="font-size:14px;font-weight:400;color:#6B7280;">/tháng</span></p>' +
+      '<p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">('+yearly[pkg]+')</p>' +
+      '</div>';
+    var rhtml='<p style="font-weight:600;color:#374151;margin:0 0 10px;">Lý do gợi ý:</p>';
+    reasons.forEach(function(r){ rhtml+='<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#0068FF;flex-shrink:0;font-weight:700;">✓</span><span>'+r+'</span></div>'; });
+    $id('result-reasons').innerHTML=rhtml;
+    $id('btn-buy').href='https://oa.zalo.me/manage/subscription?utm_source=oapricing&pkg='+encodeURIComponent(pkg);
+  }
+})();
+</script>
+
+<div class="pt-10 bg-n20 md:pt-15 max-w-full">
 <div class="container-content grid grid-cols-4 md:grid-cols-6 gap-4 text-left">
 <!-- Title & Package Header -->
 <div class="col-span-4 md:col-span-2 text-n90 text-28 font-bold leading-10 tracking-wide">So sánh quyền lợi gói</div>
