@@ -200,9 +200,9 @@
         <p style="font-weight:600;color:#1F2937;margin:16px 0 14px;">Bạn muốn bắt đầu ở mức nào?</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <label class="s-opt"><input type="radio" name="q5" value="0"><span>Miễn phí trước, dùng thử xem</span></label>
-          <label class="s-opt"><input type="radio" name="q5" value="1"><span>Khoảng 83.000đ/tháng — phù hợp gói Tiêu chuẩn</span></label>
-          <label class="s-opt"><input type="radio" name="q5" value="2"><span>Khoảng 250.000đ/tháng — phù hợp gói Tăng trưởng</span></label>
-          <label class="s-opt"><input type="radio" name="q5" value="3"><span>Không giới hạn, muốn dùng đầy đủ nhất</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="1"><span>Dưới 100.000đ/tháng</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="2"><span>Dưới 500.000đ/tháng</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="3"><span>Hơn 500.000đ/tháng</span></label>
         </div>
       </div>
 
@@ -301,80 +301,37 @@
     var q2=getStrVal('q2'); // "chat","broadcast","automate","api"
     var q3=getVal('q3');    // 0=<1k, 1=1k-10k, 2=>10k
     var q4=getVal('q4');    // 3, 5, 15, 100
-    var q5=getVal('q5');    // 0=Cơ bản, 1=Tiêu chuẩn, 2=Tăng trưởng, 3=no cap
+    var q5=getVal('q5');    // 0=Cơ bản, 1=Tiêu chuẩn, 2=Tăng trưởng, 3=Toàn diện
 
-    // ── Bước 1: B1 từ C4 (team size) ──
+    // ── Bước 1: từ Q4 (số nhân viên) ──
     var b1;
-    if(q4<=3) b1=0;
-    else if(q4<=5) b1=1;
-    else if(q4<=15) b1=2;
-    else b1=3;
+    if(q4<=3)  b1=0;      // Cơ bản
+    else if(q4<=5)  b1=1; // Tiêu chuẩn
+    else if(q4<=15) b1=2; // Tăng trưởng
+    else b1=3;             // Toàn diện
 
-    // ── Bước 2: B2 floor từ C2, C3 ──
-    var b2;
-    if(q2==='api' || q3===2) b2=3;   // → Toàn diện
-    else if(q2==='automate') b2=2;   // → Tăng trưởng
-    else b2=1;                        // default → Tiêu chuẩn (tối thiểu)
+    // ── Bước 2: từ Q2 (mục đích sử dụng) ──
+    var b2Map={'chat':0,'broadcast':1,'automate':2,'api':3};
+    var b2=(b2Map[q2]!==undefined)?b2Map[q2]:0;
 
-    // ── Bước 3: B3 cap từ C5 ──
-    var b3=q5; // 0=Cơ bản, 1=Tiêu chuẩn, 2=Tăng trưởng, 3=Toàn diện
+    // ── Bước 3: từ Q3 (số khách hàng/tháng) ──
+    var b3Map={0:0,1:2,2:3}; // <1k→Cơ bản, 1k-10k→Tăng trưởng, >10k→Toàn diện
+    var b3=(b3Map[q3]!==undefined)?b3Map[q3]:0;
 
-    // ── Kết quả ──
-    var preResult=Math.max(b1,b2);
-    var finalScore=Math.min(preResult,b3);
-    var wasDowngraded=finalScore<preResult;
+    // ── package_result = Max(B1, B2, B3) ──
+    var packageResult=Math.max(b1,b2,b3);
+
+    // ── pre_result = từ Q5 (ngân sách) ──
+    var preResult=q5;
 
     var pkgs=['Cơ bản','Tiêu chuẩn','Tăng trưởng','Toàn diện'];
-    var pkg=pkgs[finalScore];
-    var suggested=pkgs[preResult];
+    var pkg=pkgs[packageResult];
 
-    // ── Lý do gợi ý ──
-    var reasons=[];
-
-    // Lý do 1: C1 = đã dùng nâng cao
-    if(q1==='advanced'){
-      reasons.push('Bạn đã có kinh nghiệm — gói Tăng trưởng hoặc Toàn diện sẽ mở thêm tính năng mới để mở rộng');
-    }
-
-    // Lý do 2: C4 team size (luôn hiển thị)
-    var teamLabels={3:'1–3 người',5:'4–5 người',15:'6–15 người',100:'hơn 15 người'};
-    var teamPkgs={3:'Cơ bản',5:'Tiêu chuẩn',15:'Tăng trưởng',100:'Toàn diện'};
-    reasons.push('Team ' + (teamLabels[q4]||'') + ' → phù hợp giới hạn nhân sự gói ' + (teamPkgs[q4]||''));
-
-    // Lý do 3: C2 = Chatbot hoặc API
-    if(q2==='automate' || q2==='api'){
-      reasons.push('Chatbot & Tự động hóa quy trình có đầy đủ từ gói Tăng trưởng');
-    }
-
-    // Lý do 4: C3 > 10k
-    if(q3===2){
-      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao — Toàn diện là lựa chọn tốt nhất');
-    }
-
-    // Lý do 5: C2 = API
-    if(q2==='api'){
-      reasons.push('Bạn cần tích hợp hệ thống qua API — chỉ Toàn diện có 2.000 req/phút và App ủy quyền không giới hạn');
-    }
-
-    // Lý do 6: upsell khi bị downgrade bởi budget
-    if(wasDowngraded){
-      var upsellMap={
-        'Toàn diện|Tăng trưởng': 'Có thể nâng lên Toàn diện (+292k/tháng) để có API 2.000 req/phút, không giới hạn App ủy quyền và tối đa 100 nhân viên',
-        'Toàn diện|Tiêu chuẩn': 'Nâng lên Toàn diện (+417k/tháng) khi cần xử lý khối lượng lớn hoặc tích hợp hệ thống nâng cao',
-        'Toàn diện|Cơ bản':   'Bắt đầu miễn phí — nâng cấp bất cứ lúc nào khi có ngân sách',
-        'Tăng trưởng|Tiêu chuẩn': 'Có thể nâng lên Tăng trưởng (+125k/tháng) để dùng Chatbot và tự động hóa quy trình',
-        'Tăng trưởng|Cơ bản':  'Bắt đầu miễn phí — Tăng trưởng là bước tiếp theo khi cần Chatbot và tự động hóa',
-        'Tiêu chuẩn|Cơ bản': 'Bắt đầu miễn phí — Tiêu chuẩn (+83k/tháng) là bước tiếp theo khi sẵn sàng'
-      };
-      var upsellKey=suggested+'|'+pkg;
-      if(upsellMap[upsellKey]) reasons.push('💡 '+upsellMap[upsellKey]);
-    }
-
-    // ── Hiển thị ──
+    // ── Hiển thị card ──
     var clr={
       'Cơ bản':    {col:'#4B5563',bg:'#F9FAFB',bdr:'#9CA3AF',icon:'📦'},
       'Tiêu chuẩn':{col:'#1F2937',bg:'#F9FAFB',bdr:'#6B7280',icon:'💬'},
-      'Tăng trưởng': {col:'#0068FF',bg:'#EFF6FF',bdr:'#0068FF',icon:'⚙️'},
+      'Tăng trưởng':{col:'#0068FF',bg:'#EFF6FF',bdr:'#0068FF',icon:'⚙️'},
       'Toàn diện':  {col:'#92400E',bg:'#FFFBEB',bdr:'#FFA800',icon:'⭐'}
     };
     var yearly={
@@ -391,16 +348,67 @@
     };
     var c=clr[pkg];
     $id('result-card').innerHTML=
-      '<div style="background:'+c.bg+';border:2px solid '+c.bdr+';border-radius:14px;padding:24px;text-align:center;">' +
-      '<div style="font-size:36px;margin-bottom:6px;">'+c.icon+'</div>' +
-      '<p style="font-size:13px;color:#6B7280;margin:0 0 4px;">Gói phù hợp nhất với bạn</p>' +
-      '<p style="font-size:28px;font-weight:800;color:'+c.col+';margin:0 0 6px;">'+pkg+'</p>' +
-      '<p style="font-size:22px;font-weight:700;color:'+c.col+';margin:0;">'+yearly[pkg]+'</p>' +
-      '<p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">'+monthly[pkg]+'</p>' +
+      '<div style="background:'+c.bg+';border:2px solid '+c.bdr+';border-radius:14px;padding:24px;text-align:center;">'+
+      '<div style="font-size:36px;margin-bottom:6px;">'+c.icon+'</div>'+
+      '<p style="font-size:13px;color:#6B7280;margin:0 0 4px;">Gói phù hợp nhất với bạn</p>'+
+      '<p style="font-size:28px;font-weight:800;color:'+c.col+';margin:0 0 6px;">'+pkg+'</p>'+
+      '<p style="font-size:22px;font-weight:700;color:'+c.col+';margin:0;">'+yearly[pkg]+'</p>'+
+      '<p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">'+monthly[pkg]+'</p>'+
       '</div>';
-    var rhtml='<p style="font-weight:600;color:#374151;margin:0 0 10px;">Lý do gợi ý:</p>';
-    reasons.forEach(function(r){ rhtml+='<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#0068FF;flex-shrink:0;font-weight:700;">✓</span><span>'+r+'</span></div>'; });
-    $id('result-reasons').innerHTML=rhtml;
+
+    // ── Build danh sách lý do ──
+    var reasons=[];
+
+    // Lý do 1: chỉ hiện khi Q1 = "advanced"
+    if(q1==='advanced'){
+      reasons.push('Bạn đã có kinh nghiệm - gói Tăng trưởng hoặc Toàn diện sẽ mở thêm tính năng mới để mở rộng');
+    }
+
+    // Lý do 2: luôn hiện, nội dung theo Q4
+    var ly2Map={
+      3:'Team 1–3 người → phù hợp giới hạn nhân sự gói Cơ bản',
+      5:'Team 4–5 người → phù hợp giới hạn nhân sự gói Tiêu chuẩn',
+      15:'Team 6–15 người → phù hợp giới hạn nhân sự gói Tăng trưởng',
+      100:'Team hơn 15 người → phù hợp giới hạn nhân sự gói Toàn diện'
+    };
+    if(ly2Map[q4]) reasons.push(ly2Map[q4]);
+
+    // Lý do 3: chỉ hiện khi Q2 = "automate" hoặc "api"
+    if(q2==='automate'||q2==='api'){
+      reasons.push('Chatbot & Tự động hóa quy trình có đầy đủ từ gói Tăng trưởng');
+    }
+
+    // Lý do 4: chỉ hiện khi Q3 = 2 (>10.000 người/tháng)
+    if(q3===2){
+      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao → Toàn diện là lựa chọn tốt nhất');
+    }
+
+    // Lý do 5: chỉ hiện khi Q2 = "api"
+    if(q2==='api'){
+      reasons.push('Bạn cần tích hợp hệ thống qua API hiệu năng cao - Toàn diện có 2.000 req/phút và App ủy quyền không giới hạn là lựa chọn tốt nhất');
+    }
+
+    // Lý do 6: so sánh package_result vs pre_result
+    if(packageResult>preResult){
+      reasons.push('Dù hơi vượt ngân sách dự kiến, nhưng đây là gói cước tiết kiệm nhất bắt buộc phải có để đáp ứng nhu cầu của bạn.');
+    } else if(packageResult<preResult){
+      reasons.push('Tuyệt vời! Gói '+pkg+' dư sức đáp ứng toàn bộ nhu cầu của bạn, đồng thời giúp bạn tiết kiệm được một khoản lớn so với ngân sách dự kiến.');
+    }
+
+    // ── Hiển thị danh sách lý do ──
+    var reasonsEl=$id('result-reasons');
+    if(reasons.length>0){
+      reasonsEl.innerHTML=reasons.map(function(r){
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">'+
+          '<span style="color:#0068FF;font-size:14px;flex-shrink:0;margin-top:2px;">✓</span>'+
+          '<span style="color:#374151;line-height:1.55;">'+r+'</span>'+
+          '</div>';
+      }).join('');
+      reasonsEl.style.display='';
+    } else {
+      reasonsEl.style.display='none';
+    }
+
     $id('btn-buy').href='https://oa.zalo.me/manage/subscription?utm_source=oapricing&pkg='+encodeURIComponent(pkg.toLowerCase());
   }
 })();
@@ -738,9 +746,9 @@
         <p style="font-weight:600;color:#1F2937;margin:16px 0 14px;">Bạn muốn bắt đầu ở mức nào?</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <label class="s-opt"><input type="radio" name="q5" value="0"><span>Miễn phí trước, dùng thử xem</span></label>
-          <label class="s-opt"><input type="radio" name="q5" value="1"><span>Khoảng 83.000đ/tháng — phù hợp gói Tiêu chuẩn</span></label>
-          <label class="s-opt"><input type="radio" name="q5" value="2"><span>Khoảng 250.000đ/tháng — phù hợp gói Tăng trưởng</span></label>
-          <label class="s-opt"><input type="radio" name="q5" value="3"><span>Không giới hạn, muốn dùng đầy đủ nhất</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="1"><span>Dưới 100.000đ/tháng</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="2"><span>Dưới 500.000đ/tháng</span></label>
+          <label class="s-opt"><input type="radio" name="q5" value="3"><span>Hơn 500.000đ/tháng</span></label>
         </div>
       </div>
 
@@ -839,80 +847,37 @@
     var q2=getStrVal('q2'); // "chat","broadcast","automate","api"
     var q3=getVal('q3');    // 0=<1k, 1=1k-10k, 2=>10k
     var q4=getVal('q4');    // 3, 5, 15, 100
-    var q5=getVal('q5');    // 0=Cơ bản, 1=Tiêu chuẩn, 2=Tăng trưởng, 3=no cap
+    var q5=getVal('q5');    // 0=Cơ bản, 1=Tiêu chuẩn, 2=Tăng trưởng, 3=Toàn diện
 
-    // ── Bước 1: B1 từ C4 (team size) ──
+    // ── Bước 1: từ Q4 (số nhân viên) ──
     var b1;
-    if(q4<=3) b1=0;
-    else if(q4<=5) b1=1;
-    else if(q4<=15) b1=2;
-    else b1=3;
+    if(q4<=3)  b1=0;      // Cơ bản
+    else if(q4<=5)  b1=1; // Tiêu chuẩn
+    else if(q4<=15) b1=2; // Tăng trưởng
+    else b1=3;             // Toàn diện
 
-    // ── Bước 2: B2 floor từ C2, C3 ──
-    var b2;
-    if(q2==='api' || q3===2) b2=3;   // → Toàn diện
-    else if(q2==='automate') b2=2;   // → Tăng trưởng
-    else b2=1;                        // default → Tiêu chuẩn (tối thiểu)
+    // ── Bước 2: từ Q2 (mục đích sử dụng) ──
+    var b2Map={'chat':0,'broadcast':1,'automate':2,'api':3};
+    var b2=(b2Map[q2]!==undefined)?b2Map[q2]:0;
 
-    // ── Bước 3: B3 cap từ C5 ──
-    var b3=q5; // 0=Cơ bản, 1=Tiêu chuẩn, 2=Tăng trưởng, 3=Toàn diện
+    // ── Bước 3: từ Q3 (số khách hàng/tháng) ──
+    var b3Map={0:0,1:2,2:3}; // <1k→Cơ bản, 1k-10k→Tăng trưởng, >10k→Toàn diện
+    var b3=(b3Map[q3]!==undefined)?b3Map[q3]:0;
 
-    // ── Kết quả ──
-    var preResult=Math.max(b1,b2);
-    var finalScore=Math.min(preResult,b3);
-    var wasDowngraded=finalScore<preResult;
+    // ── package_result = Max(B1, B2, B3) ──
+    var packageResult=Math.max(b1,b2,b3);
+
+    // ── pre_result = từ Q5 (ngân sách) ──
+    var preResult=q5;
 
     var pkgs=['Cơ bản','Tiêu chuẩn','Tăng trưởng','Toàn diện'];
-    var pkg=pkgs[finalScore];
-    var suggested=pkgs[preResult];
+    var pkg=pkgs[packageResult];
 
-    // ── Lý do gợi ý ──
-    var reasons=[];
-
-    // Lý do 1: C1 = đã dùng nâng cao
-    if(q1==='advanced'){
-      reasons.push('Bạn đã có kinh nghiệm — gói Tăng trưởng hoặc Toàn diện sẽ mở thêm tính năng mới để mở rộng');
-    }
-
-    // Lý do 2: C4 team size (luôn hiển thị)
-    var teamLabels={3:'1–3 người',5:'4–5 người',15:'6–15 người',100:'hơn 15 người'};
-    var teamPkgs={3:'Cơ bản',5:'Tiêu chuẩn',15:'Tăng trưởng',100:'Toàn diện'};
-    reasons.push('Team ' + (teamLabels[q4]||'') + ' → phù hợp giới hạn nhân sự gói ' + (teamPkgs[q4]||''));
-
-    // Lý do 3: C2 = Chatbot hoặc API
-    if(q2==='automate' || q2==='api'){
-      reasons.push('Chatbot & Tự động hóa quy trình có đầy đủ từ gói Tăng trưởng');
-    }
-
-    // Lý do 4: C3 > 10k
-    if(q3===2){
-      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao — Toàn diện là lựa chọn tốt nhất');
-    }
-
-    // Lý do 5: C2 = API
-    if(q2==='api'){
-      reasons.push('Bạn cần tích hợp hệ thống qua API — chỉ Toàn diện có 2.000 req/phút và App ủy quyền không giới hạn');
-    }
-
-    // Lý do 6: upsell khi bị downgrade bởi budget
-    if(wasDowngraded){
-      var upsellMap={
-        'Toàn diện|Tăng trưởng': 'Có thể nâng lên Toàn diện (+292k/tháng) để có API 2.000 req/phút, không giới hạn App ủy quyền và tối đa 100 nhân viên',
-        'Toàn diện|Tiêu chuẩn': 'Nâng lên Toàn diện (+417k/tháng) khi cần xử lý khối lượng lớn hoặc tích hợp hệ thống nâng cao',
-        'Toàn diện|Cơ bản':   'Bắt đầu miễn phí — nâng cấp bất cứ lúc nào khi có ngân sách',
-        'Tăng trưởng|Tiêu chuẩn': 'Có thể nâng lên Tăng trưởng (+125k/tháng) để dùng Chatbot và tự động hóa quy trình',
-        'Tăng trưởng|Cơ bản':  'Bắt đầu miễn phí — Tăng trưởng là bước tiếp theo khi cần Chatbot và tự động hóa',
-        'Tiêu chuẩn|Cơ bản': 'Bắt đầu miễn phí — Tiêu chuẩn (+83k/tháng) là bước tiếp theo khi sẵn sàng'
-      };
-      var upsellKey=suggested+'|'+pkg;
-      if(upsellMap[upsellKey]) reasons.push('💡 '+upsellMap[upsellKey]);
-    }
-
-    // ── Hiển thị ──
+    // ── Hiển thị card ──
     var clr={
       'Cơ bản':    {col:'#4B5563',bg:'#F9FAFB',bdr:'#9CA3AF',icon:'📦'},
       'Tiêu chuẩn':{col:'#1F2937',bg:'#F9FAFB',bdr:'#6B7280',icon:'💬'},
-      'Tăng trưởng': {col:'#0068FF',bg:'#EFF6FF',bdr:'#0068FF',icon:'⚙️'},
+      'Tăng trưởng':{col:'#0068FF',bg:'#EFF6FF',bdr:'#0068FF',icon:'⚙️'},
       'Toàn diện':  {col:'#92400E',bg:'#FFFBEB',bdr:'#FFA800',icon:'⭐'}
     };
     var yearly={
@@ -929,16 +894,67 @@
     };
     var c=clr[pkg];
     $id('result-card').innerHTML=
-      '<div style="background:'+c.bg+';border:2px solid '+c.bdr+';border-radius:14px;padding:24px;text-align:center;">' +
-      '<div style="font-size:36px;margin-bottom:6px;">'+c.icon+'</div>' +
-      '<p style="font-size:13px;color:#6B7280;margin:0 0 4px;">Gói phù hợp nhất với bạn</p>' +
-      '<p style="font-size:28px;font-weight:800;color:'+c.col+';margin:0 0 6px;">'+pkg+'</p>' +
-      '<p style="font-size:22px;font-weight:700;color:'+c.col+';margin:0;">'+yearly[pkg]+'</p>' +
-      '<p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">'+monthly[pkg]+'</p>' +
+      '<div style="background:'+c.bg+';border:2px solid '+c.bdr+';border-radius:14px;padding:24px;text-align:center;">'+
+      '<div style="font-size:36px;margin-bottom:6px;">'+c.icon+'</div>'+
+      '<p style="font-size:13px;color:#6B7280;margin:0 0 4px;">Gói phù hợp nhất với bạn</p>'+
+      '<p style="font-size:28px;font-weight:800;color:'+c.col+';margin:0 0 6px;">'+pkg+'</p>'+
+      '<p style="font-size:22px;font-weight:700;color:'+c.col+';margin:0;">'+yearly[pkg]+'</p>'+
+      '<p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">'+monthly[pkg]+'</p>'+
       '</div>';
-    var rhtml='<p style="font-weight:600;color:#374151;margin:0 0 10px;">Lý do gợi ý:</p>';
-    reasons.forEach(function(r){ rhtml+='<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:#0068FF;flex-shrink:0;font-weight:700;">✓</span><span>'+r+'</span></div>'; });
-    $id('result-reasons').innerHTML=rhtml;
+
+    // ── Build danh sách lý do ──
+    var reasons=[];
+
+    // Lý do 1: chỉ hiện khi Q1 = "advanced"
+    if(q1==='advanced'){
+      reasons.push('Bạn đã có kinh nghiệm - gói Tăng trưởng hoặc Toàn diện sẽ mở thêm tính năng mới để mở rộng');
+    }
+
+    // Lý do 2: luôn hiện, nội dung theo Q4
+    var ly2Map={
+      3:'Team 1–3 người → phù hợp giới hạn nhân sự gói Cơ bản',
+      5:'Team 4–5 người → phù hợp giới hạn nhân sự gói Tiêu chuẩn',
+      15:'Team 6–15 người → phù hợp giới hạn nhân sự gói Tăng trưởng',
+      100:'Team hơn 15 người → phù hợp giới hạn nhân sự gói Toàn diện'
+    };
+    if(ly2Map[q4]) reasons.push(ly2Map[q4]);
+
+    // Lý do 3: chỉ hiện khi Q2 = "automate" hoặc "api"
+    if(q2==='automate'||q2==='api'){
+      reasons.push('Chatbot & Tự động hóa quy trình có đầy đủ từ gói Tăng trưởng');
+    }
+
+    // Lý do 4: chỉ hiện khi Q3 = 2 (>10.000 người/tháng)
+    if(q3===2){
+      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao → Toàn diện là lựa chọn tốt nhất');
+    }
+
+    // Lý do 5: chỉ hiện khi Q2 = "api"
+    if(q2==='api'){
+      reasons.push('Bạn cần tích hợp hệ thống qua API hiệu năng cao - Toàn diện có 2.000 req/phút và App ủy quyền không giới hạn là lựa chọn tốt nhất');
+    }
+
+    // Lý do 6: so sánh package_result vs pre_result
+    if(packageResult>preResult){
+      reasons.push('Dù hơi vượt ngân sách dự kiến, nhưng đây là gói cước tiết kiệm nhất bắt buộc phải có để đáp ứng nhu cầu của bạn.');
+    } else if(packageResult<preResult){
+      reasons.push('Tuyệt vời! Gói '+pkg+' dư sức đáp ứng toàn bộ nhu cầu của bạn, đồng thời giúp bạn tiết kiệm được một khoản lớn so với ngân sách dự kiến.');
+    }
+
+    // ── Hiển thị danh sách lý do ──
+    var reasonsEl=$id('result-reasons');
+    if(reasons.length>0){
+      reasonsEl.innerHTML=reasons.map(function(r){
+        return '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">'+
+          '<span style="color:#0068FF;font-size:14px;flex-shrink:0;margin-top:2px;">✓</span>'+
+          '<span style="color:#374151;line-height:1.55;">'+r+'</span>'+
+          '</div>';
+      }).join('');
+      reasonsEl.style.display='';
+    } else {
+      reasonsEl.style.display='none';
+    }
+
     $id('btn-buy').href='https://oa.zalo.me/manage/subscription?utm_source=oapricing&pkg='+encodeURIComponent(pkg.toLowerCase());
   }
 })();
