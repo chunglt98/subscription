@@ -408,13 +408,12 @@
 
 <style>
 /* ── Tooltip system for compare table ── */
-.cq-wrap{position:relative;display:inline-block;vertical-align:middle;margin-left:4px;cursor:help;}
+.cq-wrap{display:inline-block;vertical-align:middle;margin-left:4px;cursor:help;}
 .cq-wrap .cq-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#E5E7EB;color:#6B7280;font-size:11px;font-weight:700;line-height:1;flex-shrink:0;user-select:none;}
-.cq-wrap .cq-pop{visibility:hidden;opacity:0;pointer-events:none;position:absolute;left:0;top:calc(100% + 6px);z-index:200;width:260px;background:#1F2937;color:#F9FAFB;font-size:12px;line-height:1.5;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.18);transition:opacity .15s ease,visibility .15s ease;}
-.cq-wrap .cq-pop a{color:#93C5FD;text-decoration:underline;}
-.cq-wrap .cq-pop::before{content:'';position:absolute;top:-11px;left:4px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #1F2937;}
-.cq-wrap .cq-pop::after{content:'';position:absolute;top:-11px;left:0;right:0;height:11px;}
-.cq-wrap .cq-pop.cq-visible{visibility:visible;opacity:1;pointer-events:auto;}
+.cq-pop{visibility:hidden;opacity:0;pointer-events:none;position:fixed;z-index:10000;width:260px;background:#1F2937;color:#F9FAFB;font-size:12px;line-height:1.5;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.18);transition:opacity .15s ease,visibility .15s ease;}
+.cq-pop a{color:#93C5FD;text-decoration:underline;}
+.cq-pop::before{content:'';position:absolute;top:-5px;left:6px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #1F2937;}
+.cq-pop.cq-visible{visibility:visible;opacity:1;pointer-events:auto;}
 </style>
 
 <div id="compare-table" class="bg-n20 max-w-full" style="scroll-margin-top: 80px;">
@@ -632,11 +631,25 @@
 
     // Keep tooltip open when hovering over popup (so links are clickable)
     var hideTimer = null;
-    function showPop(){ clearTimeout(hideTimer); pop.classList.add('cq-visible'); }
+    function isModalOpen(){
+      var m = document.getElementById('suggest-modal');
+      return m && !m.classList.contains('hidden');
+    }
+    function showPop(){
+      if(isModalOpen()) return;
+      clearTimeout(hideTimer);
+      var rect = icon.getBoundingClientRect();
+      var left = rect.left;
+      // Clamp so popup doesn't overflow right edge of viewport
+      if(left + 260 > window.innerWidth - 8) left = window.innerWidth - 268;
+      pop.style.top  = (rect.bottom + 6) + 'px';
+      pop.style.left = left + 'px';
+      pop.classList.add('cq-visible');
+    }
     function hidePop(){ hideTimer = setTimeout(function(){ pop.classList.remove('cq-visible'); }, 150); }
     wrap.addEventListener('mouseenter', showPop);
     wrap.addEventListener('mouseleave', hidePop);
-    pop.addEventListener('mouseenter', showPop);
+    pop.addEventListener('mouseenter', function(){ clearTimeout(hideTimer); });
     pop.addEventListener('mouseleave', hidePop);
   });
 })();
