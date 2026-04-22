@@ -373,26 +373,27 @@
     };
     if(ly2Map[q4]) reasons.push(ly2Map[q4]);
 
-    // Lý do 3: chỉ hiện khi Q2 = "automate" hoặc "api"
-    if(q2==='automate'||q2==='api'){
-      reasons.push('Chatbot & Tự động hóa quy trình có đầy đủ từ gói Tăng trưởng');
-    }
-
-    // Lý do 4: chỉ hiện khi Q3 = 2 (>10.000 người/tháng)
-    if(q3===2){
-      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao → Toàn diện là lựa chọn tốt nhất');
-    }
-
-    // Lý do 5: chỉ hiện khi Q2 = "api"
-    if(q2==='api'){
+    // Lý do 3: hiện khi Q2 = "automate" hoặc "api", nội dung khác nhau
+    if(q2==='automate'){
+      reasons.push('Nhu cầu tự động hóa quy trình → gói Tăng trưởng cung cấp đủ các tính năng Tự động hóa và kết nối API');
+    } else if(q2==='api'){
       reasons.push('Bạn cần tích hợp hệ thống qua API hiệu năng cao - Toàn diện có 2.000 req/phút và App ủy quyền không giới hạn là lựa chọn tốt nhất');
     }
 
-    // Lý do 6: so sánh package_result vs pre_result
+    // Lý do 4: hiện khi Q3 >= 1 (1k-10k hoặc >10k), nội dung khác nhau
+    if(q3===1){
+      reasons.push('Phục vụ khách hàng số lượng lớn cần các tính năng tự động hóa → Tăng trưởng là lựa chọn phù hợp');
+    } else if(q3===2){
+      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao → Toàn diện là lựa chọn tốt nhất');
+    }
+
+    // Lý do 5: so sánh package_result vs pre_result
     if(packageResult>preResult){
-      reasons.push('Dù hơi vượt ngân sách dự kiến, nhưng đây là gói cước tiết kiệm nhất bắt buộc phải có để đáp ứng nhu cầu của bạn.');
+      reasons.push('Dù hơi vượt ngân sách dự kiến, nhưng '+pkg+' là gói cước tiết kiệm nhất cần có để đáp ứng nhu cầu của bạn');
     } else if(packageResult<preResult){
-      reasons.push('Tuyệt vời! Gói '+pkg+' dư sức đáp ứng toàn bộ nhu cầu của bạn, đồng thời giúp bạn tiết kiệm được một khoản lớn so với ngân sách dự kiến.');
+      reasons.push('Tuyệt vời! Gói '+pkg+' đáp ứng toàn bộ nhu cầu của bạn, đồng thời giúp bạn tiết kiệm được một khoản lớn so với ngân sách dự kiến.');
+    } else {
+      reasons.push('Tuyệt vời! Gói '+pkg+' đáp ứng toàn bộ nhu cầu của bạn');
     }
 
     // ── Hiển thị danh sách lý do ──
@@ -919,26 +920,27 @@
     };
     if(ly2Map[q4]) reasons.push(ly2Map[q4]);
 
-    // Lý do 3: chỉ hiện khi Q2 = "automate" hoặc "api"
-    if(q2==='automate'||q2==='api'){
-      reasons.push('Chatbot & Tự động hóa quy trình có đầy đủ từ gói Tăng trưởng');
-    }
-
-    // Lý do 4: chỉ hiện khi Q3 = 2 (>10.000 người/tháng)
-    if(q3===2){
-      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao → Toàn diện là lựa chọn tốt nhất');
-    }
-
-    // Lý do 5: chỉ hiện khi Q2 = "api"
-    if(q2==='api'){
+    // Lý do 3: hiện khi Q2 = "automate" hoặc "api", nội dung khác nhau
+    if(q2==='automate'){
+      reasons.push('Nhu cầu tự động hóa quy trình → gói Tăng trưởng cung cấp đủ các tính năng Tự động hóa và kết nối API');
+    } else if(q2==='api'){
       reasons.push('Bạn cần tích hợp hệ thống qua API hiệu năng cao - Toàn diện có 2.000 req/phút và App ủy quyền không giới hạn là lựa chọn tốt nhất');
     }
 
-    // Lý do 6: so sánh package_result vs pre_result
+    // Lý do 4: hiện khi Q3 >= 1 (1k-10k hoặc >10k), nội dung khác nhau
+    if(q3===1){
+      reasons.push('Phục vụ khách hàng số lượng lớn cần các tính năng tự động hóa → Tăng trưởng là lựa chọn phù hợp');
+    } else if(q3===2){
+      reasons.push('Phục vụ hơn 10.000 khách hàng/tháng cần tích hợp API hiệu năng cao → Toàn diện là lựa chọn tốt nhất');
+    }
+
+    // Lý do 5: so sánh package_result vs pre_result
     if(packageResult>preResult){
-      reasons.push('Dù hơi vượt ngân sách dự kiến, nhưng đây là gói cước tiết kiệm nhất bắt buộc phải có để đáp ứng nhu cầu của bạn.');
+      reasons.push('Dù hơi vượt ngân sách dự kiến, nhưng '+pkg+' là gói cước tiết kiệm nhất cần có để đáp ứng nhu cầu của bạn');
     } else if(packageResult<preResult){
-      reasons.push('Tuyệt vời! Gói '+pkg+' dư sức đáp ứng toàn bộ nhu cầu của bạn, đồng thời giúp bạn tiết kiệm được một khoản lớn so với ngân sách dự kiến.');
+      reasons.push('Tuyệt vời! Gói '+pkg+' đáp ứng toàn bộ nhu cầu của bạn, đồng thời giúp bạn tiết kiệm được một khoản lớn so với ngân sách dự kiến.');
+    } else {
+      reasons.push('Tuyệt vời! Gói '+pkg+' đáp ứng toàn bộ nhu cầu của bạn');
     }
 
     // ── Hiển thị danh sách lý do ──
