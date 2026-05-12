@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rollout Timeline – Restructure Subscription 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8f9fc;
+    --surface2: #ffffff;
+    --border: #e2e6ef;
+    --border-strong: #c8cedc;
+    --accent: #2563eb;
+    --accent-bg: #eff4ff;
+    --old: #b45309;
+    --old-bg: #fffbeb;
+    --old-border: #fcd34d;
+    --web: #059669;
+    --web-bg: #f0fdf9;
+    --web-border: #6ee7c7;
+    --red: #dc2626;
+    --red-bg: #fff5f5;
+    --red-border: #fca5a5;
+    --text: #1a202c;
+    --muted: #64748b;
+    --light: #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    min-height: 100vh;
+    padding: 48px 32px 80px;
+  }
+
+  .container { max-width: 1080px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .header-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .legend-dot.new { background: var(--accent); }
+  .legend-dot.old { background: var(--old); }
+  .legend-dot.web { background: var(--web); }
+  .legend-dot.bcast { background: var(--red); }
+
+  /* ── HORIZONTAL TIMELINE ── */
+  .timeline-track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  /* connecting rail */
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    top: 38px;
+    left: calc(12.5% );
+    right: calc(12.5% );
+    height: 2px;
+    background: linear-gradient(to right, var(--border-strong), var(--accent) 85%, #10b981);
+    z-index: 0;
+  }
+
+  /* milestone column */
+  .milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    animation: fadeUp 0.45s ease both;
+    padding: 0 10px;
+  }
+  .milestone:nth-child(1) { animation-delay: 0.05s; }
+  .milestone:nth-child(2) { animation-delay: 0.15s; }
+  .milestone:nth-child(3) { animation-delay: 0.25s; }
+  .milestone:nth-child(4) { animation-delay: 0.38s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* date badge above node */
+  .date-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+    z-index: 1;
+  }
+  .date-main {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+  }
+  .date-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--light);
+    margin-top: 2px;
+    letter-spacing: 0.06em;
+  }
+  .milestone.final .date-main { color: var(--accent); }
+
+  /* node dot */
+  .node {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2.5px solid var(--border-strong);
+    background: #fff;
+    z-index: 2;
+    position: relative;
+    flex-shrink: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .milestone.final .node {
+    border-color: var(--accent);
+    background: var(--accent);
+    width: 20px; height: 20px;
+    box-shadow: 0 0 0 4px var(--accent-bg);
+  }
+  .milestone:hover .node {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 5px var(--accent-bg);
+  }
+
+  /* card below node */
+  .card {
+    margin-top: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    width: 100%;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .milestone:hover .card {
+    border-color: var(--border-strong);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .milestone.final .card {
+    border-color: rgba(37,99,235,0.25);
+    background: #fafbff;
+  }
+  .milestone.final:hover .card {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(37,99,235,0.10);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .final .card-title { color: var(--accent); }
+
+  .section { margin-bottom: 12px; }
+  .section:last-child { margin-bottom: 0; }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 7px;
+  }
+  .section-label.new {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid rgba(37,99,235,0.2);
+  }
+  .section-label.old {
+    background: var(--old-bg);
+    color: var(--old);
+    border: 1px solid var(--old-border);
+  }
+  .section-label.web {
+    background: var(--web-bg);
+    color: var(--web);
+    border: 1px solid var(--web-border);
+  }
+  .section-label.broadcast {
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid var(--red-border);
+  }
+
+  .items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .items li {
+    font-size: 12px;
+    color: #475569;
+    padding-left: 13px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .items li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: var(--light);
+    font-size: 11px;
+  }
+  .items li.none { color: var(--light); font-style: italic; }
+  .items li.none::before { content: ''; }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: #1e40af;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="header-label">Vận hành · Restructure Subscription</div>
+      <h1>Rollout Timeline</h1>
+      <div class="header-sub">Kế hoạch triển khai gói Subscription mới — 18/5 → 1/6/2026</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot new"></div> Gói mới</div>
+      <div class="legend-item"><div class="legend-dot old"></div> Gói cũ</div>
+      <div class="legend-item"><div class="legend-dot web"></div> Website</div>
+      <div class="legend-item"><div class="legend-dot bcast"></div> Broadcast</div>
+    </div>
+  </div>
+
+  <div class="timeline-track">
+
+    <!-- 18/5 -->
+    <div class="milestone">
+      <div class="date-badge">
+        <div class="date-main">18/5</div>
+        <div class="date-sub">2026</div>
+      </div>
+      <div class="node"></div>
+      <div class="card">
+        <div class="card-title">Live Whitelist</div>
+        <div class="section">
+          <div class="section-label new">Gói mới</div>
+          <ul class="items">
+            <li><code>buyable = false</code> — ẩn trên giao diện</li>
+            <li>Cho phép mua qua link trực tiếp (Để test nội bộ)</li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="section">
+          <div class="section-label old">Gói cũ</div>
+          <ul class="items">
+            <li>Cập nhật config field mới (mặc định có quyền Các Menu cũ)</li>
+            <li>Không thay đổi các quota hiện tại</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 25/5 -->
+    <div class="milestone">
+      <div class="date-badge">
+        <div class="date-main">25/5</div>
+        <div class="date-sub">2026</div>
+      </div>
+      <div class="node"></div>
+      <div class="card">
+        <div class="card-title">Developer Update</div>
+        <div class="section">
+          <div class="section-label new">Gói mới</div>
+          <ul class="items">
+            <li>Hiển thị danh sách Product mới trên Developer page — <strong>chưa cho mua (Để cho Agency có thể biết trước danh sách sản phẩm)</strong></li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="section">
+          <div class="section-label old">Gói cũ</div>
+          <ul class="items">
+            <li class="none">Không có action</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 31/5 -->
+    <div class="milestone">
+      <div class="date-badge">
+        <div class="date-main">31/5</div>
+        <div class="date-sub">2026</div>
+      </div>
+      <div class="node"></div>
+      <div class="card">
+        <div class="card-title">Pre-cutover</div>
+        <div class="section">
+          <div class="section-label new">Gói mới</div>
+          <ul class="items">
+            <li class="none">Không có action</li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="section">
+          <div class="section-label old">Gói cũ</div>
+          <ul class="items">
+            <li>Tắt <code>auto-renew</code> — không renew vào 00:00 ngày 1/6</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1/6 -->
+    <div class="milestone final">
+      <div class="date-badge">
+        <div class="date-main">1/6</div>
+        <div class="date-sub">10:00 · 2026</div>
+      </div>
+      <div class="node"></div>
+      <div class="card">
+        <div class="card-title">🚀 Official Release</div>
+        <div class="section">
+          <div class="section-label new">Gói mới</div>
+          <ul class="items">
+            <li><code>buyable = 1</code> — hiển thị &amp; cho phép mua trên OAM &amp; API</li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="section">
+          <div class="section-label old">Gói cũ</div>
+          <ul class="items">
+            <li><code>buyable = 0</code> — ẩn khỏi OAM &amp; không cho mua qua API</li>
+            <li>Bỏ thông tin trên Developer page</li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="section">
+          <div class="section-label web">Website</div>
+          <ul class="items">
+            <li>Cập nhật trang Bảng giá &amp; file bảng giá điện tử mới</li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="section">
+          <div class="section-label broadcast">Broadcast</div>
+          <ul class="items">
+            <li>Official Release — gửi tới tất cả OA</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end timeline-track -->
+</div>
+</body>
+</html>
